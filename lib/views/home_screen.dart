@@ -2,9 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_app/controller/weather_services.dart';
 import 'package:weather_app/model/weather_model.dart';
+import 'package:weather_app/shared/constants/constant_function.dart';
 import 'package:weather_app/shared/constants/string.dart';
 import 'package:weather_app/views/sign_in_page.dart';
-import 'package:location/location.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,46 +28,13 @@ class _HomePageState extends State<HomePage> {
 
   TextEditingController cityController = TextEditingController();
 
-  // Get device location
-
-  Location location = Location();
-
-  Future<void> getCurrentLocation() async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    LocationData _locationData;
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        // Location services are still not enabled; handle accordingly
-        return;
-      }
-    }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        // Location permission not granted; handle accordingly
-        return;
-      }
-    }
-
-    _locationData = await location.getLocation();
-    double latitude = _locationData.latitude!;
-    double longitude = _locationData.longitude!;
-
-    // Now you have the latitude and longitude; proceed with reverse geocoding to get the city name
-  }
-
   String cityName = "Pune";
 
   @override
   Widget build(BuildContext context) {
     // final weatherData = WeatherService().getWeatherData('Pune');
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text("Weather App"),
           actions: [
@@ -144,12 +111,17 @@ class _HomePageState extends State<HomePage> {
                         style: const TextStyle(
                             fontSize: 40.0, fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                        weatherData.resolvedAddress.toString(),
-                        style: const TextStyle(
-                            fontSize: 36.0,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.overline),
+                      FittedBox(
+                        fit: BoxFit.fitWidth,
+                        child: Text(
+                          weatherData.resolvedAddress.toString(),
+                          style: const TextStyle(
+                              fontSize: 36.0,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.overline),
+                              // maxLines: 1,
+                              // overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -165,71 +137,73 @@ class _HomePageState extends State<HomePage> {
                                 fontWeight: FontWeight.w400,
                                 fontStyle: FontStyle.italic),
                             textAlign: TextAlign.center,
+                            maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
-                      // Data and time
 
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: [
-                      //     Text(
-                      //       '${weatherData.currentConditions!.datetime}',
-                      //       style: const TextStyle(
-                      //           fontSize: 18.0, fontWeight: FontWeight.w400),
-                      //     ),
-                      //     const VerticalDivider(),
-                      //     Text(
-                      //       weatherData.days![0].datetime.toString(),
-                      //       style: const TextStyle(
-                      //           fontSize: 18.0, fontWeight: FontWeight.w400),
-                      //     ),
-                      //   ],
-                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Text("Min Temp.: ${weatherData.days![0].tempmin}",
                               style: const TextStyle(
-                                  fontSize: 24.0, fontWeight: FontWeight.w400)),
+                                  fontSize: 16.0, fontWeight: FontWeight.w400)),
                           Text("Max Temp.: ${weatherData.days![0].tempmax}",
                               style: const TextStyle(
-                                  fontSize: 24.0, fontWeight: FontWeight.w400)),
+                                  fontSize: 16.0, fontWeight: FontWeight.w400)),
                         ],
                       ),
-                      // const Divider(
-                      //   thickness: 2,
-                      //   color: Colors.black,
-                      // ),
-                      Container(child: Text("7 Days Forecast")),
+                      20.ph,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.blue),
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(20))),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text("Coming Week Forecast"),
+                            )),
+                      ),
                       Container(
                         height: deviceHeight! * 0.4,
                         width: deviceWidth! * 0.8,
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
                             borderRadius: BorderRadius.circular(5)),
-                        child: ListView.builder(
-                            itemCount: 7,
-                            itemBuilder: (context, index) {
-                              var data = snapshot.data!.days![index + 1];
-                              return ListTile(
-                                title: Text(data.datetime.toString()),
-                                subtitle: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Min Temp.: ${data.tempmin}",
-                                        style: const TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w400)),
-                                    Text("Max Temp.: ${data.tempmax}",
-                                        style: const TextStyle(
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w400)),
-                                  ],
-                                ),
-                              );
-                            }),
+                        child: Scrollbar(
+                          thickness: 8,
+                          trackVisibility: true,
+                          interactive: true,
+                          child: ListView.separated(
+                            separatorBuilder: (BuildContext context, int index) => const Divider(height: 1),
+                              itemCount: 7,
+                              itemBuilder: (context, index) {
+                                var data = snapshot.data!.days![index + 1];
+                                return ListTile(
+                                  leading: Text(data.datetime.toString()),
+                                  subtitle: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Min: ${data.tempmin}",
+                                          style: const TextStyle(
+                                              fontSize: 12.0,
+                                              fontWeight: FontWeight.w400)),
+                                      Text("Max: ${data.tempmax}",
+                                          style: const TextStyle(
+                                              fontSize: 12.0,
+                                              fontWeight: FontWeight.w400)),
+                                    ],
+                                  ),
+                                  title: Text(data.description!, style: const TextStyle(
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.w400)),
+                                );
+                              }),
+                        ),
                       )
                     ],
                   );
