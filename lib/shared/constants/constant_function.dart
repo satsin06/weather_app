@@ -18,7 +18,7 @@ setSnackbar(String msg, BuildContext context,
     ..removeCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
-        //behavior: SnackBarBehavior.floating,
+        
         content: Text(
           msg,
           textAlign: TextAlign.center,

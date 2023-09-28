@@ -48,7 +48,7 @@ void main() async {
                   ),
                 ),
               ),
-            ); // Replace with your error UI if needed
+            ); 
           } else {
             return const MyApp();
           }

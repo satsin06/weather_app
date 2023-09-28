@@ -18,7 +18,7 @@ class _SignInPageState extends State<SignInPage> {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   TextEditingController phoneController = TextEditingController();
   TextEditingController otpController = TextEditingController();
-  bool otpSent = false; // Track whether OTP has been sent
+  bool otpSent = false; 
   FirebaseAuth auth = FirebaseAuth.instance;
   bool processing = false;
   String _verificationId = "";
@@ -50,7 +50,7 @@ class _SignInPageState extends State<SignInPage> {
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
-                  labelText: 'Phone Number with country code',
+                  labelText: 'Phone Number',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
@@ -100,36 +100,37 @@ class _SignInPageState extends State<SignInPage> {
                     }
                     return null;
                   },
+                  onChanged: (value) {
+                  setState(() {
+                    value.length == 6
+                        ? FocusScope.of(context).unfocus()
+                        : null;
+                    isTenDigits = true;
+                    processing = false;
+                  });
+                },
                 ),
               ElevatedButton(
                 onPressed: () {
                   if (otpSent) {
-                    // Perform OTP verification logic here
                     if (_globalKey.currentState!.validate()) {
                       if (processing) {
                         null;
                       } else if (otpSent) {
                         otpSent = true;
                         processing == true ? null : verifyOTP();
-                        // verifyOTP();
                       } else if (phoneController.text.length != 10) {
                         setState(() {
                           isTenDigits = false;
                         });
                       }
-                      // OTP verification is successful
-                      // You can add your logic here to verify the OTP
-                      // If OTP is correct, you can proceed with further actions.
-                      // If OTP is incorrect, show an error message.
                     }
                   } else {
-                    // Send OTP logic here (e.g., send OTP to the entered phone number)
                     if (_globalKey.currentState!.validate()) {
-                      // OTP has been sent successfully
+                      setState(() {
+                        processing = true;
+                      });
                       phoneSignIn(phoneNumber: phoneController.text);
-                      // setState(() {
-
-                      // });
                     }
                   }
                 },
@@ -143,14 +144,14 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void verifyOTP() async {
+    setState(() {
+      processing = true;
+    });
     String code = otpController.text.trim();
     AuthCredential credential = PhoneAuthProvider.credential(
         verificationId: _verificationId, smsCode: code);
     auth.signInWithCredential(credential).then(
       (value) async {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('Processing...')),
-        // );
         afterVerification();
       },
     ).catchError((error) {
@@ -173,7 +174,6 @@ class _SignInPageState extends State<SignInPage> {
             otpSent = true;
           });
           await auth.signInWithCredential(credential);
-          // After verification do something
         },
         verificationFailed: _onVerificationFailed,
         codeSent: _onCodeSent,
@@ -192,7 +192,6 @@ class _SignInPageState extends State<SignInPage> {
       processing = false;
     });
     if (exception.code == 'invalid-phone-number') {
-      // showMessage("The phone number entered is invalid!");
       setState(() {
         otpSent = false;
         isTenDigits = false;

@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // final weatherData = WeatherService().getWeatherData('Pune');
+    
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -134,11 +134,11 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        // onChanged: (value) {
-                        //   setState(() {
-                        //     cityName = value;
-                        //   });
-                        // },
+                        
+                        
+                        
+                        
+                        
                         onEditingComplete: () {
                           FocusScope.of(context).unfocus();
                           cityController.text.isEmpty
@@ -179,8 +179,8 @@ class _HomePageState extends State<HomePage> {
                                       fontSize: 36.0,
                                       fontWeight: FontWeight.bold,
                                       decoration: TextDecoration.overline),
-                                  // maxLines: 1,
-                                  // overflow: TextOverflow.ellipsis,
+                                  
+                                  
                                 ),
                               ),
                             ),
