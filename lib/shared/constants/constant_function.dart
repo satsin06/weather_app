@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 extension EmptyPadding on num {
@@ -31,4 +32,15 @@ setSnackbar(String msg, BuildContext context,
         duration: duration,
       ),
     );
+}
+
+Future<bool> checkInternetConnection() async {
+  final connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult == ConnectivityResult.none) {
+    return false;
+  } else if (connectivityResult == ConnectivityResult.mobile ||
+      connectivityResult == ConnectivityResult.wifi) {
+    return true;
+  }
+  return false;
 }
